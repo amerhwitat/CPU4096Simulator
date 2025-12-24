@@ -546,16 +546,3 @@ Maps efficiently to modern CPUs
 
 Enables research in ultra-wide architectures, AI, cryptography, and high-performance simulation
 
-If you want next, I can:
-
-Define the binary instruction encoding
-
-Write a formal ABI
-
-Provide a reference C++ implementation
-
-Create UML or block diagrams
-
-Compare P4096 vs ARM, x86, and RISC-V
-
-
