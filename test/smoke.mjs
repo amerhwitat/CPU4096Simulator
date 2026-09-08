@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import { createServer } from '../server.js';
+const s=createServer();
+await new Promise(r=>s.listen(0,r));
+const port=s.address().port;
+const health=await fetch(`http://127.0.0.1:${port}/api/health`).then(r=>r.json());
+assert.equal(health.ok,true);
+const catalog=await fetch(`http://127.0.0.1:${port}/api/runtime/catalog`).then(r=>r.json());
+assert.ok(catalog.commands.length>20);
+s.close();
+console.log('smoke ok');
