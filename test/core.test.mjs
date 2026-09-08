@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { WideWord, CpuCore, OPCODES, RuntimeCatalog } from '../src/chimera.js';
+import { generateEd25519, hash, hmac } from '../src/keygen.js';
+import { Vector128D, BootDesktopProgress } from '../src/koronos.js';
 
 test('4096-bit arithmetic is modulo 2^4096', () => {
   const a = WideWord.fromBigInt((1n << 4095n) + 5n, 4096);
@@ -29,4 +31,20 @@ test('runtime catalog exposes shells, utilities and optional services', () => {
   assert.ok(c.commands.includes('awk'));
   assert.ok(c.services.includes('sshd'));
   assert.ok(c.services.includes('samba'));
+});
+
+test('keygen exposes Ed25519, hashing and HMAC', () => {
+  const k=generateEd25519();
+  assert.equal(k.algorithm,'Ed25519');
+  assert.ok(k.publicKey.length>20 && k.privateKey.length>20);
+  assert.equal(hash('abc'),'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad');
+  assert.equal(hmac('abc','key').length,64);
+});
+
+test('128D vector and desktop progress contracts work', () => {
+  const v=new Vector128D(Array(128).fill(1));
+  assert.equal(v.norm(),Math.sqrt(128));
+  const p=new BootDesktopProgress();
+  assert.throws(()=>p.setDesktop(10),/boot/);
+  p.setBoot(100);p.setDesktop(100);assert.equal(p.state().complete,true);
 });
