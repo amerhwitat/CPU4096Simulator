@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { CpuCore } from '../src/chimera.js';
 import { MemoryBus, VirtualMemory } from '../src/memory.js';
 import { Scheduler, IpcBus, CapabilitySet } from '../src/kernel.js';
@@ -13,3 +14,4 @@ test('kernel scheduler IPC capabilities',()=>{const s=new Scheduler(2);const p=s
 test('network models',()=>{const b=new PacketBus();b.send({protocol:'UDP',payload:new Uint8Array([1])});assert.equal(b.recv().protocol,'UDP');const d=new DnsTable();d.put('host','::1','AAAA');assert.equal(d.resolve('host','AAAA'),'::1');const t=new TcpStateMachine();t.connect();assert.equal(t.state,'ESTABLISHED')});
 test('128D brain and robotics',()=>{const s=new State128D();assert.equal(s.values.length,128);const n=new BrainNetwork();n.addNode('a',s);n.addNode('b',s);n.connect('a','b',1);assert.equal(n.step().nodes.length,2);const h=new RoboticsHAL();h.registerSensor('x',()=>42);assert.equal(h.read('x'),42);const swarm=new SwarmScheduler();swarm.add('a',0);swarm.add('b',1);assert.equal(swarm.balance().length,2)});
 test('assembler accepts canonical instruction',()=>{assert.equal(assembleLine('ADD R1, R2, R3').opcode,1);const c=new CpuCore(4096);c.regs[2]=c.regs[2].constructor.fromBigInt(4n,4096);c.regs[3]=c.regs[3].constructor.fromBigInt(5n,4096);c.execute(assembleLine('ADD R1, R2, R3'));assert.equal(c.regs[1].toBigInt(),9n)});
+test('web controls expose click and Enter command paths',()=>{const html=fs.readFileSync(new URL('../public/index.html',import.meta.url),'utf8');const js=fs.readFileSync(new URL('../public/app.js',import.meta.url),'utf8');assert.match(html,/id="command"/);assert.match(html,/id="commandForm"/);assert.match(js,/addEventListener\('click'/);assert.match(js,/addEventListener\('submit'/);assert.match(js,/event\.key === 'Enter'/);assert.match(js,/function executeCommand/);});
