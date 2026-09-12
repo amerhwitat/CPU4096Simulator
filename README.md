@@ -14,6 +14,12 @@ The 8192-bit datapath, 128 logical 64-bit lanes and brain-network model are soft
 
 Crypto/AI workloads use public or synthetic material. Address-targeted private-key enumeration, seed guessing and unauthorized wallet access are excluded.
 
+## Chimera 128D + authenticated P2P
+
+The simulator participates in the portfolio-wide 128D semantic state model and canonical authenticated P2P envelope. Simulator nodes can exchange opt-in health, capability, workload, snapshot and delta metadata using deterministic JSON contracts, payload hashing, sequence validation and local authorization. Browser peers may use WebSocket/WebRTC at the transport boundary without changing the logical envelope.
+
+The P2P layer does not perform unsolicited Internet scanning, transfer credentials/private keys, distribute arbitrary executables, or expose remote command execution. See `docs/CHIMERA_128D_P2P_INTEGRATION.md` and the canonical contracts in `ChimeraIIOS/docs/`.
+
 ## Run
 
 ```bash
@@ -28,3 +34,7 @@ Node.js 24 LTS or newer is recommended. Open the local dashboard on the port pri
 ## API
 
 The existing API covers health, ISA, runtime, CPU, kernel, memory, network, brain, robotics, Koronos, assembler, compiler, simulation, hashing, HMAC, secure randomness and Ed25519 key generation. See `docs/` for the detailed API and implementation status.
+
+## Licensing
+
+Original project code is released under GNU GPL v3 or later. Third-party components, libraries, fonts, assets and upstream source remain under their respective licenses.
