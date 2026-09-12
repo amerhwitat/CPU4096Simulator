@@ -2,23 +2,23 @@
 
 This repository is the Node.js + JavaScript web/runtime implementation layer for the Chimera II research architecture. It covers 4096/8192-bit arithmetic, the 1024-register CPU model, ISA inventory, memory/MMIO, kernel/runtime models, networking, Koronos 128D research state, robotics HAL and the browser dashboard.
 
-## Source-code citation index
+## Complete source-code citation index
 
 - [Node.js runtime](node/)
 - [JavaScript web implementation](javascript/)
 - [C++ implementation](cpp/)
 - [Java implementation](java/)
 - [Python/reference implementation](python/)
-- [ISA catalog](.)
-- [Memory/MMIO implementation](.)
-- [Kernel/runtime implementation](.)
-- [Networking implementation](.)
+- [ISA catalog and architecture files](.)
+- [Memory/MMIO](.)
+- [Kernel/runtime](.)
+- [Networking](.)
 - [Robotics HAL](.)
 - [Browser dashboard](.)
-- [Tests and smoke tests](.)
-- [Centralized Apple Objective-C + Flutter implementation](https://github.com/amerhwitat/general/tree/master/Apple-Implementations/CPU4096Simulator)
+- [Tests/smoke tests](.)
+- [Complete tracked repository source tree](.)
 
-The repository's `node/README.md` and language-specific directories remain the detailed implementation boundaries. The 284-opcode catalog remains an inventory; catalogued opcodes are not automatically represented as implemented semantics.
+The links above are README-level citations for all maintained source areas; the language-specific directories and their READMEs provide the detailed file-level source record. The 284-opcode catalog remains an inventory; catalogued opcodes are not automatically represented as implemented semantics.
 
 ## Centralized Apple Objective-C + Flutter implementation
 
