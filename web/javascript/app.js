@@ -1,0 +1,1 @@
+let pc=0;document.querySelector('#step').onclick=()=>{pc++;document.querySelector('#out').value=`PC=${pc}`};
