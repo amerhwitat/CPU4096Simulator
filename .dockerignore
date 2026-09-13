@@ -1,0 +1,15 @@
+.git
+.github
+.gitignore
+Dockerfile
+docker-compose.yml
+.dockerignore
+build/
+cmake-build-*/
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.exe
+*.log
