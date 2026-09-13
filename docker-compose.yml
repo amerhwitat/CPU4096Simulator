@@ -1,0 +1,6 @@
+services:
+  simulator:
+    build: .
+    image: amerhwitat/cpu4096simulator:local
+    container_name: cpu4096simulator
+    init: true
