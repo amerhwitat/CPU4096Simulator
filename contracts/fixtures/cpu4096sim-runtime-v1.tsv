@@ -1,0 +1,7 @@
+# case<TAB>width_bits<TAB>lhs_unsigned_decimal<TAB>rhs_unsigned_decimal<TAB>operand<TAB>expected<TAB>pc_after
+add	8192	10	32	0	42	16
+wrap-add	64	18446744073709551615	1	0	0	16
+shift-left	128	1	0	65	36893488147419103232	16
+shift-right	128	36893488147419103232	0	65	1	16
+snapshot	128	36893488147419103231	0	0	0000000000000001ffffffffffffffff	0
+metadata	0	0	0	0	chimera.cpu.workload|1|register-snapshot	0
