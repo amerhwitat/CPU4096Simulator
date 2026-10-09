@@ -35,5 +35,5 @@ public final class WideWord {
         if (count < 0) throw new IllegalArgumentException("negative shift");
         return new WideWord(count >= bits ? BigInteger.ZERO : value.shiftRight(count), bits);
     }
-    public String hex() { return value.toString(16).toLowerCase().formatted("%" + (bits / 4) + "s").replace(' ', '0'); }
+    public String hex() { return String.format("%" + (bits / 4) + "s", value.toString(16)).replace(' ', '0'); }
 }
