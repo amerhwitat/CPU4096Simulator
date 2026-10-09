@@ -5,3 +5,4 @@ shift-left	128	1	0	65	36893488147419103232	16
 shift-right	128	36893488147419103232	0	65	1	16
 snapshot	128	36893488147419103231	0	0	0000000000000001ffffffffffffffff	0
 metadata	0	0	0	0	chimera.cpu.workload|1|register-snapshot	0
+trace-order	8192	10	32	0	42,74	32
