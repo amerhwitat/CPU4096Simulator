@@ -20,6 +20,15 @@ class RuntimeContractTest {
             String[] f = line.split("\\t", -1);
             assertEquals(7, f.length, "malformed fixture: " + line);
             switch (f[0]) {
+                case "trace-order" -> {
+                    CpuCore cpu = new CpuCore(8192, 32);
+                    cpu.setRegister(1, new WideWord(new BigInteger(f[2]), 8192));
+                    cpu.setRegister(2, new WideWord(new BigInteger(f[3]), 8192));
+                    String first = cpu.execute(CpuCore.ADD, 0, 1, 2, 0).toBigInteger().toString();
+                    String second = cpu.execute(CpuCore.ADD, 3, 0, 2, 0).toBigInteger().toString();
+                    assertEquals(f[5], first + "," + second);
+                    assertEquals(Long.parseLong(f[6]), cpu.pc());
+                }
                 case "metadata" -> {
                     CpuCore cpu = new CpuCore(8192, 32);
                     assertEquals("{\"schema\":\"chimera.cpu.workload\",\"version\":1,\"kind\":\"register-snapshot\",\"payload\":\"width=128;words=2\"}",
@@ -49,7 +58,7 @@ class RuntimeContractTest {
             }
             count++;
         }
-        assertEquals(6, count);
+        assertEquals(7, count);
     }
 
     @Test
