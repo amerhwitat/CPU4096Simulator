@@ -24,7 +24,7 @@ class AssemblerTest {
   cpu.setRegister(1,new WideWord(BigInteger.TEN,64)); cpu.setRegister(2,new WideWord(BigInteger.valueOf(6),64));
   assertEquals(BigInteger.valueOf(12),cpu.execute(CpuCore.XOR,3,1,2,0).toBigInteger());
   assertEquals(BigInteger.valueOf(60),cpu.execute(CpuCore.MUL,3,1,2,0).toBigInteger());
-  assertEquals(BigInteger.ONE,cpu.execute(CpuCore.CMPLT,3,1,2,0).toBigInteger());
+  assertEquals(BigInteger.ZERO,cpu.execute(CpuCore.CMPLT,3,1,2,0).toBigInteger());
   cpu.execute(CpuCore.CMP,0,1,2,0); assertEquals(new CpuCore.Flags(false,false,true,false),cpu.flags());
   long before=cpu.pc(); assertThrows(IllegalStateException.class,()->cpu.execute(CpuCore.SYS_CALL,0,0,0,0)); assertEquals(before,cpu.pc());
   cpu.setPrivilege(1); assertNull(cpu.execute(CpuCore.SYS_CALL,0,0,0,0));
