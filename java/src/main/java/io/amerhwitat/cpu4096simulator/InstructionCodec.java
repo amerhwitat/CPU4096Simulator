@@ -67,7 +67,7 @@ public final class InstructionCodec {
 
     public static String disassemble(Instruction instruction) {
         Objects.requireNonNull(instruction, "instruction");
-        return String.format("op=0x%04X r%u, r%u, r%u, imm=0x%s",
+        return String.format("op=0x%04X r%d, r%d, r%d, imm=0x%s",
             instruction.opcode(), instruction.dst(), instruction.srcA(), instruction.srcB(),
             instruction.immediate().toString(16).toUpperCase());
     }
