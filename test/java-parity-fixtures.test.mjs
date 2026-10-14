@@ -6,7 +6,10 @@ import { WideWord, CpuCore, OPCODES } from '../src/chimera.js';
 test('Java and Node simulator use the same deterministic contract vectors', async () => {
   const text = await readFile(new URL('../contracts/fixtures/cpu4096sim-runtime-v1.tsv', import.meta.url), 'utf8');
   const rows = text.split(/\r?\n/).filter(line => line && !line.startsWith('#')).map(line => line.split('\t'));
-  assert.equal(rows.length, 7);
+  assert.equal(rows.length, 19);
+  const opcodes = { add: OPCODES.ADD, 'wrap-add': OPCODES.ADD, 'shift-left': OPCODES.SHL, 'shift-right': OPCODES.SHR,
+    and: OPCODES.AND, or: OPCODES.OR, xor: OPCODES.XOR, not: OPCODES.NOT, mul: OPCODES.MUL, mulhi: OPCODES.MULHI,
+    rol: OPCODES.ROL, ror: OPCODES.ROR, div: OPCODES.DIV, rem: OPCODES.REM, cmpeq: OPCODES.CMPEQ, cmplt: OPCODES.CMPLT };
   for (const [kind, widthText, lhsText, rhsText, operandText, expected, pcText] of rows) {
     const width = Number(widthText);
     if (kind === 'metadata') {
@@ -15,22 +18,16 @@ test('Java and Node simulator use the same deterministic contract vectors', asyn
       assert.deepEqual(envelope, { schema: 'chimera.cpu.workload', version: 1, kind: 'register-snapshot', payload: 'width=128;words=2' });
       continue;
     }
-    if (kind === 'snapshot') {
-      assert.equal(WideWord.fromBigInt(BigInt(lhsText), width).hex(), expected);
-      continue;
-    }
+    if (kind === 'snapshot') { assert.equal(WideWord.fromBigInt(BigInt(lhsText), width).hex(), expected); continue; }
     const cpu = new CpuCore(width, 32);
-    cpu.regs[1] = WideWord.fromBigInt(BigInt(lhsText), width);
-    cpu.regs[2] = WideWord.fromBigInt(BigInt(rhsText), width);
-    const immediate = Number(operandText);
+    cpu.regs[1] = WideWord.fromBigInt(BigInt(lhsText), width); cpu.regs[2] = WideWord.fromBigInt(BigInt(rhsText), width);
     if (kind === 'trace-order') {
       cpu.execute({ opcode: OPCODES.ADD, dst: 0, srcA: 1, srcB: 2, immediate: 0n });
       cpu.execute({ opcode: OPCODES.ADD, dst: 3, srcA: 0, srcB: 2, immediate: 0n });
       assert.equal(cpu.regs[0].toBigInt().toString() + ',' + cpu.regs[3].toBigInt().toString(), expected);
     } else {
-      const opcode = kind === 'add' || kind === 'wrap-add' ? OPCODES.ADD : kind === 'shift-left' ? OPCODES.SHL : OPCODES.SHR;
-      const out = cpu.execute({ opcode, dst: 0, srcA: 1, srcB: 2, immediate: BigInt(immediate) });
-      assert.equal(out.toBigInt().toString(), expected);
+      const out = cpu.execute({ opcode: opcodes[kind], dst: 0, srcA: 1, srcB: 2, immediate: BigInt(operandText) });
+      assert.equal(out.toBigInt().toString(), expected, 'fixture ' + kind);
     }
     assert.equal(cpu.pc.toString(), pcText);
   }
