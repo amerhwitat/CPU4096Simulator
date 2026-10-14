@@ -1,13 +1,25 @@
 # Java implementation
 
-JavaFX visualization layer for simulator traces, benchmark dashboards, deterministic vectors, and cross-language experiment metadata.
+The Java 21 headless simulator core is a host-side semantic model for the repository's fixed 16-byte instruction envelope. It does not claim to be a standardized ISA or a hardware emulator.
 
-## Java 21 headless simulator core
+## Components
 
-The tracked Java directory previously contained only this README; it did not contain the documented JavaFX trace/dashboard source. The current headless core includes `WideWord` fixed-width arithmetic, a deterministic `CpuCore` supporting ADD/SUB/MOV/SHL/SHR, canonical 16-byte little-endian instruction encoding, ordered register snapshots, and a stable workload-envelope boundary. Shared vectors live in `../contracts/fixtures/cpu4096sim-runtime-v1.tsv`; run `mvn --batch-mode --no-transfer-progress clean verify` from this directory.
+- `WideWord`: unsigned fixed-width arithmetic, with widths that are positive multiples of 64.
+- `InstructionCodec`: canonical little-endian encoding/decoding for opcode:u16, dst:u16, srcA:u16, srcB:u16, immediate:u64.
+- `Assembler`: source-line parsing and machine-code emission for the currently supported mnemonic set, R/Z register aliases, decimal/hex/binary unsigned immediates, comments, and byte-aligned disassembly.
+- `CpuCore`: deterministic host-side semantics for ADD/SUB/AND/OR/XOR/NOT/MOV/SHL/SHR/MUL/MULHI/ROL/ROR/DIV/REM/CMP/CMPEQ/CMPLT/SYS_CALL/BARRIER/POLICY_UPDATE, including comparison flags and privilege guards.
+- `MemoryBus`: bounded byte-addressed memory, unsigned 64-bit data access, mapped permission regions, execute checks, and W^X enforcement for mapped regions.
 
-## Memory bus contract
+## Build and test
 
-`MemoryBus` provides bounded byte-addressed RAM, unsigned 64-bit data accessors, explicit half-open permission regions, executable checks, and W^X enforcement for mapped regions. `MemoryBusTest` covers byte order, out-of-range accesses, region overlap, write denial, W^X, and unsigned overflow. The memory bus is a host-side simulator model; it does not claim hardware MMU, TLB, DMA, or real CPU memory protection.
+Run from this directory:
 
-This still does not claim the JavaFX UI or the full opcode catalog is implemented.
+```sh
+mvn --batch-mode --no-transfer-progress clean verify
+```
+
+Java and Node share `../contracts/fixtures/cpu4096sim-runtime-v1.tsv`. The current 19 vectors cover arithmetic, shifts, bitwise operations, multiply/high-multiply, rotations, division/remainder, comparisons, snapshots, metadata, and trace order.
+
+## Scope and remaining parity
+
+This is a scoped parity milestone. Labels, branches/control-flow assembly, all 284 catalog entries, complete flag behavior, a full machine-code execution pipeline, real MMU/TLB/DMA, and hardware execution are not implemented by these classes. Documentation and passing contract tests do not imply native hardware readiness.
