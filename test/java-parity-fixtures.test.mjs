@@ -34,7 +34,7 @@ test('Java and Node simulator use the same deterministic contract vectors', asyn
   }
 });
 test('assembler resolves labels and branch opcodes execute absolute byte targets', () => {
-  const bytes = assemble('start: MOV R1, R0\\nCMP R1, R0\\nJZ done\\nADD R1, R1, R1\\ndone: JMP done');
+  const bytes = assemble('start: MOV R1, R0\nCMP R1, R0\nJZ done\nADD R1, R1, R1\ndone: JMP done');
   assert.equal(bytes.length, 80);
   const cpu = new CpuCore(64, 8);
   const at = offset => cpu.decode(bytes.slice(offset, offset + 16));
@@ -45,5 +45,5 @@ test('assembler resolves labels and branch opcodes execute absolute byte targets
   cpu.execute(at(64));
   assert.equal(cpu.pc, 64n);
   assert.throws(() => assemble('JMP missing'), /undefined label/);
-  assert.throws(() => assemble('again: MOV R1, R0\\nagain: JMP again'), /duplicate label/);
+  assert.throws(() => assemble('again: MOV R1, R0\nagain: JMP again'), /duplicate label/);
 });
