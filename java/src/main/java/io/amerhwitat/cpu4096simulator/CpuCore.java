@@ -9,7 +9,7 @@ public final class CpuCore {
     public static final int ADD=0x0001, SUB=0x0002, AND=0x0003, OR=0x0004, XOR=0x0005,
         NOT=0x0006, MOV=0x0007, SHL=0x0008, SHR=0x0009, MUL=0x000a, MULHI=0x000b,
         ROL=0x000c, ROR=0x000d, DIV=0x000e, REM=0x000f, CMP=0x0010, CMPEQ=0x0011,
-        CMPLT=0x0012, SYS_CALL=0x0013, BARRIER=0x0014, POLICY_UPDATE=0x0015;
+        CMPLT=0x0012, SYS_CALL=0x0013, BARRIER=0x0014, POLICY_UPDATE=0x0015, JMP=0x0016, JZ=0x0017, JNZ=0x0018;
 
     public record Flags(boolean zero, boolean negative, boolean carry, boolean overflow) {}
     private final int bits;
@@ -51,6 +51,7 @@ public final class CpuCore {
         WideWord a=registers[srcA], b=registers[srcB], out=null;
         BigInteger imm=instruction.immediate();
         int shift;
+        boolean branched=false;
         switch (instruction.opcode()) {
             case ADD -> out=a.add(b);
             case SUB -> out=a.subtract(b);
