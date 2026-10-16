@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { WideWord, CpuCore, OPCODES } from '../src/chimera.js';
+import { assemble } from '../src/assembler.js';
 
 test('Java and Node simulator use the same deterministic contract vectors', async () => {
   const text = await readFile(new URL('../contracts/fixtures/cpu4096sim-runtime-v1.tsv', import.meta.url), 'utf8');
@@ -31,4 +32,18 @@ test('Java and Node simulator use the same deterministic contract vectors', asyn
     }
     assert.equal(cpu.pc.toString(), pcText);
   }
+});
+test('assembler resolves labels and branch opcodes execute absolute byte targets', () => {
+  const bytes = assemble('start: MOV R1, R0\\nCMP R1, R0\\nJZ done\\nADD R1, R1, R1\\ndone: JMP done');
+  assert.equal(bytes.length, 80);
+  const cpu = new CpuCore(64, 8);
+  const at = offset => cpu.decode(bytes.slice(offset, offset + 16));
+  assert.equal(at(32).opcode, OPCODES.JZ);
+  assert.equal(at(32).immediate, 64n);
+  cpu.execute(at(0)); cpu.execute(at(16)); cpu.execute(at(32));
+  assert.equal(cpu.pc, 64n);
+  cpu.execute(at(64));
+  assert.equal(cpu.pc, 64n);
+  assert.throws(() => assemble('JMP missing'), /undefined label/);
+  assert.throws(() => assemble('again: MOV R1, R0\\nagain: JMP again'), /duplicate label/);
 });
