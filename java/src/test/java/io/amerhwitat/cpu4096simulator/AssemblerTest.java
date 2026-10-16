@@ -37,7 +37,7 @@ class AssemblerTest {
  }
 
  @Test void resolvesLabelsAndExecutesAbsoluteByteAddressBranches() {
-  byte[] code=Assembler.assemble("start: MOV R1, R0\\nCMP R1, R0\\nJZ done\\nADD R1, R1, R1\\ndone: JMP done");
+  byte[] code=Assembler.assemble("start: MOV R1, R0\nCMP R1, R0\nJZ done\nADD R1, R1, R1\ndone: JMP done");
   assertEquals(80,code.length);
   InstructionCodec.Instruction branch=InstructionCodec.decode(java.util.Arrays.copyOfRange(code,32,48));
   assertEquals(CpuCore.JZ,branch.opcode());
@@ -48,6 +48,6 @@ class AssemblerTest {
   cpu.execute(InstructionCodec.decode(java.util.Arrays.copyOfRange(code,64,80)));
   assertEquals(64,cpu.pc());
   assertThrows(IllegalArgumentException.class,()->Assembler.assemble("JMP missing"));
-  assertThrows(IllegalArgumentException.class,()->Assembler.assemble("again: MOV R1, R0\\nagain: JMP again"));
+  assertThrows(IllegalArgumentException.class,()->Assembler.assemble("again: MOV R1, R0\nagain: JMP again"));
  }
 }
