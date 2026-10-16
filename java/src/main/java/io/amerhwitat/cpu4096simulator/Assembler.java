@@ -19,7 +19,7 @@ public final class Assembler {
         Map.entry("ROR",CpuCore.ROR),Map.entry("DIV",CpuCore.DIV),Map.entry("REM",CpuCore.REM),
         Map.entry("CMP",CpuCore.CMP),Map.entry("CMPEQ",CpuCore.CMPEQ),Map.entry("CMPLT",CpuCore.CMPLT),
         Map.entry("SYS_CALL",CpuCore.SYS_CALL),Map.entry("BARRIER",CpuCore.BARRIER),
-        Map.entry("POLICY_UPDATE",CpuCore.POLICY_UPDATE));
+        Map.entry("POLICY_UPDATE",CpuCore.POLICY_UPDATE),Map.entry("JMP",CpuCore.JMP),Map.entry("JZ",CpuCore.JZ),Map.entry("JNZ",CpuCore.JNZ));
     private static final Pattern REGISTER=Pattern.compile("^[RZ](\\d+)$",Pattern.CASE_INSENSITIVE);
     private static final BigInteger U64_MAX=BigInteger.ONE.shiftLeft(64).subtract(BigInteger.ONE);
     private Assembler() {}
@@ -60,6 +60,8 @@ public final class Assembler {
         List<String> args=new ArrayList<>(List.of(tokens).subList(1,tokens.length));
         int dst=0,srcA=0,srcB=0;
         BigInteger immediate=BigInteger.ZERO;
+        boolean branch=List.of("JMP","JZ","JNZ").contains(mnemonic);
+        if(branch) { if(args.size()!=1) throw new IllegalArgumentException(mnemonic+" requires one byte-address or label"); immediate=parseImmediate(args.get(0)); return new InstructionCodec.Instruction(opcode,0,0,0,immediate); }
         boolean unary=List.of("NOT","MOV","SYS_CALL","BARRIER","POLICY_UPDATE").contains(mnemonic);
         if(unary) {
             if(args.size()>0) dst=parseRegister(args.get(0));
@@ -81,9 +83,33 @@ public final class Assembler {
     }
     public static byte[] assemble(String source) {
         if(source==null) throw new IllegalArgumentException("source must not be null");
+        String[] raw=source.split("\\R");
+        Map<String,Integer> labels=new java.util.LinkedHashMap<>();
+        List<String> instructions=new ArrayList<>();
+        int offset=0;
+        for(String rawLine:raw) {
+            String clean=rawLine.replaceFirst("[;#].*$","").trim();
+            if(clean.isEmpty()) continue;
+            Matcher label=Pattern.compile("^([A-Za-z_][A-Za-z0-9_]*):").matcher(clean);
+            if(label.find()) {
+                String name=label.group(1);
+                if(labels.putIfAbsent(name,offset)!=null) throw new IllegalArgumentException("duplicate label: "+name);
+                clean=clean.substring(label.end()).trim();
+                if(clean.isEmpty()) continue;
+            }
+            instructions.add(clean);
+            offset+=InstructionCodec.INSTRUCTION_BYTES;
+        }
         ByteArrayOutputStream output=new ByteArrayOutputStream();
-        for(String line:source.split("\\R")) {
-            InstructionCodec.Instruction instruction=assembleLine(line);
+        for(String line:instructions) {
+            String resolved=line;
+            Matcher branch=Pattern.compile("^(JMP|JZ|JNZ)\\s+([A-Za-z_][A-Za-z0-9_]*)$",Pattern.CASE_INSENSITIVE).matcher(line);
+            if(branch.matches()) {
+                Integer address=labels.get(branch.group(2));
+                if(address==null) throw new IllegalArgumentException("undefined label: "+branch.group(2));
+                resolved=branch.group(1)+" "+address;
+            }
+            InstructionCodec.Instruction instruction=assembleLine(resolved);
             if(instruction!=null) output.writeBytes(InstructionCodec.encode(instruction));
         }
         return output.toByteArray();
