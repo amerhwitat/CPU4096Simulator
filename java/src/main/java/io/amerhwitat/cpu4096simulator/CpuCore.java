@@ -83,10 +83,17 @@ public final class CpuCore {
             case SYS_CALL -> { if (privilege < 1) throw new IllegalStateException("SYS_CALL requires privilege >= 1"); }
             case BARRIER -> { /* deterministic single-core barrier */ }
             case POLICY_UPDATE -> { if (privilege < 3) throw new IllegalStateException("POLICY_UPDATE requires privilege >= 3"); }
+            case POLICY_UPDATE -> { if (privilege < 3) throw new IllegalStateException("POLICY_UPDATE requires privilege >= 3"); }
+            case JMP, JZ, JNZ -> {
+                if (imm.bitLength() > 63 || imm.mod(BigInteger.valueOf(InstructionCodec.INSTRUCTION_BYTES)).signum()!=0)
+                    throw new IllegalArgumentException("branch target must be an aligned byte address within signed 64-bit PC range");
+                boolean take = instruction.opcode()==JMP || (instruction.opcode()==JZ && flags.zero()) || (instruction.opcode()==JNZ && !flags.zero());
+                if(take) { pc=imm.longValueExact(); branched=true; }
+            }
             default -> throw new IllegalArgumentException("unsupported opcode: " + instruction.opcode());
         }
         if (out != null) registers[dst]=out;
-        pc += InstructionCodec.INSTRUCTION_BYTES;
+        if (!branched) pc += InstructionCodec.INSTRUCTION_BYTES;
         return out;
     }
     private int shiftCount(BigInteger value) {
