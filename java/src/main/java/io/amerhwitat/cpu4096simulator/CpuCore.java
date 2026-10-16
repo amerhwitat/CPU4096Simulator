@@ -83,7 +83,6 @@ public final class CpuCore {
             case SYS_CALL -> { if (privilege < 1) throw new IllegalStateException("SYS_CALL requires privilege >= 1"); }
             case BARRIER -> { /* deterministic single-core barrier */ }
             case POLICY_UPDATE -> { if (privilege < 3) throw new IllegalStateException("POLICY_UPDATE requires privilege >= 3"); }
-            case POLICY_UPDATE -> { if (privilege < 3) throw new IllegalStateException("POLICY_UPDATE requires privilege >= 3"); }
             case JMP, JZ, JNZ -> {
                 if (imm.bitLength() > 63 || imm.mod(BigInteger.valueOf(InstructionCodec.INSTRUCTION_BYTES)).signum()!=0)
                     throw new IllegalArgumentException("branch target must be an aligned byte address within signed 64-bit PC range");
